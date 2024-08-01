@@ -108,6 +108,8 @@ app.get("/profile", (req, res) => {
 app.post("/bookings", async (req, res) => {
   const { token } = req.cookies;
 
+  console.log(token)
+
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
   }
