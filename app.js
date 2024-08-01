@@ -78,7 +78,9 @@ app.post("/login", async (req, res) => {
 
           return res
             .status(200)
-            .cookie("token", token)
+            .cookie("token", token, {
+              sameSite: "None"
+            })
             .json({ ...UserDoc, password: "encrypted" });
         }
       );
@@ -108,7 +110,7 @@ app.get("/profile", (req, res) => {
 app.post("/bookings", async (req, res) => {
   const { token } = req.cookies;
 
-  console.log(token)
+  console.log(token);
 
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
