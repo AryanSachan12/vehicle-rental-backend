@@ -25,11 +25,17 @@ app.use(
 
 async function getUserDataFromToken(req) {
   return new Promise((resolve, reject) => {
-    if (req.cookies.token) {
-      jwt.verify(req.cookies.token, jwtSecret, {}, async (error, userData) => {
-        if (error) throw error;
-        resolve(userData);
+    const token = req.cookies.token;
+    if (token) {
+      jwt.verify(token, jwtSecret, (error, userData) => {
+        if (error) {
+          console.error("Token verification failed:", error);
+          return resolve(null); // Resolve with null if verification fails
+        }
+        return resolve(userData);
       });
+    } else {
+      return resolve(null); // Resolve with null if no token is provided
     }
   });
 }
@@ -128,10 +134,18 @@ app.post("/bookings", async (req, res) => {
 });
 
 app.get("/bookings", async (req, res) => {
-  const userData = await getUserDataFromToken(req);
-  const bookings = await Booking.find({ user: userData.id });
+  try {
+    const userData = await getUserDataFromToken(req);
+    if (!userData) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
-  res.status(200).json(bookings);
+    const bookings = await Booking.find({ user: userData.id });
+    return res.status(200).json(bookings);
+  } catch (error) {
+    console.error("Error fetching bookings:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
 });
 
 app.get("/listings", async (req, res) => {
