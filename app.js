@@ -79,7 +79,9 @@ app.post("/login", async (req, res) => {
           return res
             .status(200)
             .cookie("token", token, {
-              sameSite: "None"
+              httpOnly: true,
+              secure: true,
+              sameSite: "None",
             })
             .json({ ...UserDoc, password: "encrypted" });
         }
@@ -100,7 +102,7 @@ app.get("/profile", (req, res) => {
       if (error) throw error;
       const { _doc: userDoc } = await User.findById(userData.id);
 
-      return res.json({ ...userDoc, password: "encrypted" });
+      return res.json({ ...userDoc });
     });
   } else {
     return res.json(null);
