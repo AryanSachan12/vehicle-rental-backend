@@ -82,6 +82,7 @@ app.post("/login", async (req, res) => {
               httpOnly: true,
               secure: true,
               sameSite: "None",
+              path: '/',
             })
             .json({ ...UserDoc, password: "encrypted" });
         }
